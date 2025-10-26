@@ -25,16 +25,56 @@ The project demonstrates key AWS skills:
 
 ```mermaid
 graph LR
-  Internet((Internet)) --> IGW[Internet Gateway]
-  IGW -->|0.0.0.0/0| RTpub[Public Route Table]
-  RTpub --> Pub[Public Subnet]
-  Pub --> App[EC2 - Mattermost App<br/>Ports: 22, 80, 443, 8065]
-  Pub --> NAT[NAT Gateway]
-  NAT -->|0.0.0.0/0| RTpriv[Private Route Table]
-  RTpriv --> Priv[Private Subnet]
-  Priv --> DB[EC2 - MySQL Database<br/>Ports: 22, 80, 443, 3306]
-  App -->|TCP 3306| DB
-  App -->|TCP 8065| Internet
+  %% =========================
+  %% Internet edge + IGW
+  %% =========================
+  Internet((Internet))
+  IGW[Internet Gateway]
+
+  Internet --- IGW
+
+  %% =========================
+  %% VPC boundary
+  %% =========================
+  subgraph VPC["VPC 10.0.0.0/16"]
+    direction LR
+
+    %% -------- Public side --------
+    subgraph PublicRT["Public Route Table\n0.0.0.0/0 → IGW"]
+    end
+
+    subgraph PublicSubnet["Public Subnet 10.0.1.0/24\n(Auto-assign public IP: ON)"]
+      NAT[NAT Gateway\n(Allocated EIP)]
+      App[EC2: Mattermost App\nSG Inbound: 22, 80, 443, 8065\nListens on TCP 8065]
+    end
+
+    %% -------- Private side --------
+    subgraph PrivateRT["Private Route Table\n0.0.0.0/0 → NAT Gateway"]
+    end
+
+    subgraph PrivateSubnet["Private Subnet 10.0.2.0/24\n(No public IPs)"]
+      DB[EC2: MySQL Database\nSG Inbound: 22, 80, 443, 3306\nListens on TCP 3306]
+    end
+  end
+
+  %% =========================
+  %% Routing relationships
+  %% =========================
+  IGW --- PublicRT
+  PublicRT --- PublicSubnet
+
+  %% Private subnet egress: PrivateRT → NAT → IGW → Internet
+  PrivateRT --- PrivateSubnet
+  PrivateRT -- "0.0.0.0/0" --> NAT
+  NAT -- egress --> IGW
+
+  %% =========================
+  %% Application flows
+  %% =========================
+  Internet -- "TCP 8065" --> App
+  App -- "TCP 3306" --> DB
+
+
 ```
 
 ---
