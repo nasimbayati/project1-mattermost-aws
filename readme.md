@@ -23,44 +23,41 @@ The project demonstrates key AWS skills:
 
 ## 🏗️ Architecture Diagram
 
-```mermaid
-flowchart LR
-  %% Internet edge
-  Internet((Internet)) --- IGW[Internet Gateway]
+Below is the architecture of the two-tier Mattermost deployment on AWS.  
+It illustrates how public and private subnets, routing components, and EC2 instances communicate securely within the VPC.
 
-  %% VPC boundary
-  subgraph VPC["VPC 10.0.0.0/16"]
-    direction LR
+<p align="center">
+  <img src="docs/diagrams/aws-mattermost-architecture.png" alt="AWS Architecture Diagram" width="800"/>
+</p>
 
-    %% Route tables (as nodes)
-    PublicRT[Public Route Table\n0.0.0.0/0 -> IGW]
-    PrivateRT[Private Route Table\n0.0.0.0/0 -> NAT Gateway]
+> **Figure:** Mattermost (Application Layer) is deployed in the **Public Subnet**, while MySQL (Database Layer) is hosted in the **Private Subnet**.  
+> The **Internet Gateway (IGW)** provides public access for the application, and the **NAT Gateway** enables the private database instance to download updates securely without a public IP.
 
-    %% Public side
-    subgraph PublicSubnet["Public Subnet 10.0.1.0/24\nAuto-assign public IP: ON"]
-      NAT[NAT Gateway\nEIP attached]
-      App[EC2: Mattermost App\nSG: 22,80,443,8065\nListens: TCP 8065]
-    end
+### 🔹 Key Components
 
-    %% Private side
-    subgraph PrivateSubnet["Private Subnet 10.0.2.0/24\nNo public IPs"]
-      DB[EC2: MySQL Database\nSG: 22,80,443,3306\nListens: TCP 3306]
-    end
-  end
+| Layer | Component | Description |
+|-------|------------|-------------|
+| **Internet Edge** | Internet Gateway (IGW) | Allows public inbound/outbound traffic for resources in the public subnet. |
+| **VPC** | 10.0.0.0/16 | Isolated virtual network containing all subnets and resources. |
+| **Public Subnet** | 10.0.1.0/24 | Hosts the **Mattermost Application Server (EC2)** and the **NAT Gateway** with an Elastic IP. |
+| **Private Subnet** | 10.0.2.0/24 | Hosts the **MySQL Database Server (EC2)**, with no public IP. |
+| **Public Route Table** | Route: `0.0.0.0/0 → IGW` | Sends Internet-bound traffic through the Internet Gateway. |
+| **Private Route Table** | Route: `0.0.0.0/0 → NAT Gateway` | Sends Internet-bound traffic from private subnet through NAT. |
+| **Security Groups** | App-SG / DB-SG | Controls inbound/outbound ports for EC2 instances (App: 22,80,443,8065 / DB: 22,80,443,3306). |
 
-  %% Route relationships
-  IGW --- PublicRT
-  PublicRT --- PublicSubnet
+### 🔹 Network Traffic Flow
 
-  PrivateRT --- PrivateSubnet
-  NAT --- IGW
+1. **Client (Internet)** → **IGW** → **App Server (Public Subnet)** on port **8065**  
+2. **App Server** → **DB Server (Private Subnet)** on port **3306**  
+3. **DB Server** → **NAT Gateway** → **IGW** for outbound updates (no direct public access)
 
-  %% Application flows
-  Internet -- TCP 8065 --> App
-  App -- TCP 3306 --> DB
+---
 
+### 🧭 Download the Vector Version
+If you’d like to zoom in or reuse the diagram, download the SVG version:
 
-```
+[📄 Download Architecture Diagram (SVG)](docs/diagrams/aws-mattermost-architecture.svg)
+
 
 ---
 
