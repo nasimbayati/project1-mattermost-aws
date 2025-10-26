@@ -279,6 +279,28 @@ To achieve elasticity for Mattermost:
 
 ---
 
+## 🚀 How to Use This Repository
+
+1. **Clone this repo:**
+   ```bash
+   git clone https://github.com/<your-username>/project1-mattermost-aws.git
+   cd project1-mattermost-aws
+   ```
+
+
+2. **Explore the documentation:**
+
+   - `README.md` — Full project walkthrough
+   - `docs/diagrams/` — Architecture visuals
+   - `docs/screenshots/` — Step-by-step evidence
+
+3. **View the architecture:**
+
+   - PNG inline in README: `docs/diagrams/aws-mattermost-architecture.png`
+   - Optional SVG for zooming: `docs/diagrams/aws-mattermost-architecture.svg`
+
+---
+
 ## 🧹 Resource Cleanup
 
 When finished, delete in reverse order:
@@ -295,11 +317,16 @@ When finished, delete in reverse order:
 project1-mattermost-aws/
 ├── README.md
 ├── docs/
+│   ├── diagrams/
+│   │   ├── aws-mattermost-architecture.png
+│   │   └── aws-mattermost-architecture.svg
 │   └── screenshots/
 │       ├── 01-vpc-created.png
 │       ├── ...
 │       └── 25-mattermost-web-access.png
-└── .gitignore
+├── .gitignore
+└── LICENSE
+
 ```
 
 **.gitignore**
@@ -328,4 +355,10 @@ Thumbs.db
 Bachelor of Applied Science in Software Development (ACC)  
 Post Graduate Program in Cloud Computing: Leveraging AI (UT Austin)  
 AWS Cloud Practitioner and Solutions Architect in progress ☁️
+
+---
+
+## 📜 License
+This project is licensed under the [MIT License](LICENSE).  
+© 2025 Nasim Bayati — for educational and non-commercial use.
 
