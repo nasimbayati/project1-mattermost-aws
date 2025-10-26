@@ -1,0 +1,4 @@
+*.pem
+*.ppk
+.DS_Store
+Thumbs.db
