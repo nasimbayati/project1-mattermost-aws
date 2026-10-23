@@ -212,6 +212,7 @@ At the `mysql>` prompt:
 ALTER USER 'root'@'localhost' IDENTIFIED BY '<YOUR_STRONG_PASSWORD>';
 exit;
 ```
+Replace `<YOUR_STRONG_PASSWORD>` with your own strong password. Never commit a real password to the repository.
 
 **Finalize Setup:**
 ```bash
